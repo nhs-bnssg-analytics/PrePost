@@ -1,0 +1,95 @@
+---
+output:
+  word_document
+---
+
+---
+title: `r pres_title`
+author: `r pres_author`^[*Created using an R script developed by ICB Modelling and Analytics. Suggestions, comments and bug reports to richard.wood16@nhs.net.*]
+date: `r pres_date`
+output: 
+  word_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE)
+```
+
+## 1. Descriptive overview of the identified cohort
+
+The cohort contains `r nrow(cohort)` instances for which an index event is recorded. Among these, there are `r length(unique(cohort$nhs_number))` unique patients, meaning an average of `r round(nrow(cohort)/length(unique(cohort$nhs_number)),digits=1)` index events per patient.
+
+The below figure contains attributes for the `r length(unique(cohort_atts2$instance_id))` instances (`r length(unique(cohort_atts2$nhs_number))` unique patients) that have relevant attribute data (taken from the closest month to the index event).
+
+For context, the attributes of the general BNSSG population is also included, from the most recent month's data.
+
+``` {r  fig.height=4.5, fig.width=6, eval=TRUE,echo=FALSE,warning=FALSE, results='hide',message=FALSE}
+descr_plot
+```
+
+## 2. Activity volumes before and after the index event
+
+The tables below summarise the volumes of activity occurring before and after the index event, for the `r nrow(cohort)` instances in the cohort.
+
+```{r tbl_summ_bf, echo=FALSE,tab.cap="xxx"}
+kable(tbl_summ_bf,caption="Summary of activity volumes BEFORE the index event",
+      align=c("l","r","r","r"))
+```
+
+```{r tbl_summ_af, echo=FALSE,tab.cap="xxx"}
+kable(tbl_summ_af,caption="Summary of activity volumes AFTER the index event",
+      align=c("l","r","r","r"))
+```
+
+## 3. Activity theographs for a sample of the cohort
+
+The below figure contains examples of theographs. Here, each row contains activity for a certain patient centred around the index event (including the unique *#instance_id*). 
+
+Only the top 30 instances, by highest total volume of activity within the considered window, are included here (see the associated *theographs_full.pdf* file for the full results).
+
+``` {r  fig.height=6, fig.width=6.5, warning=FALSE, eval=TRUE,echo=FALSE}
+theo_plot
+```
+
+## 4. Tallies of distinct activity profiles around the index event
+
+Considered here are the various combinations of activity volume profiles around the index event, in terms of a tally of the number of instances which match the distinct activity volume profile. The particular order or timing of the activities is not a consideration.
+
+Only the top 10 distinct activity profiles, by frequency, are included here (see the associated *tallies_full.xlsx* file for the full results).
+
+```{r tbl_tally_bf, echo=FALSE,tab.cap="xxx"}
+kable(head(tbl_bf,n=10),caption="Tally of distinct activity volume profiles BEFORE the index event",
+      align=c(rep("c",ncol(tbl_bf)-2),"r","r"))
+```
+
+```{r tbl_tally_af, echo=FALSE,tab.cap="xxx"}
+kable(head(tbl_af,n=10),caption="Tally of distinct activity volume profiles AFTER the index event",
+      align=c(rep("c",ncol(tbl_af)-2),"r","r"))
+```
+
+```{r tbl_tally_both, echo=FALSE,tab.cap="xxx"}
+kable(head(tbl_both,n=10),caption="Tally of distinct activity volume profiles both BEFORE (B) and AFTER (A) the index event",
+      align=c(rep("c",ncol(tbl_both)-2),"r","r"))
+```
+
+## 5. Trace-plots displaying activity order around the index event
+
+Building on the tallies, trace-plots can be used to illustrate the particular order of activities. The three columns show the frequency and percentage (which should equate to the tallies in the previous section) and the cumulative percentage
+
+Only the top 10 distinct activity profiles are included here (see the associated *trace_before_full.pdf*, *trace_after_full.pdf* and *trace_both_full.pdf* files for the full results).
+
+
+``` {r  fig.height=4, fig.width=6.5, warning=FALSE, eval=TRUE,echo=FALSE}
+plot_trace_bf
+```
+
+``` {r  fig.height=4, fig.width=6.5, warning=FALSE, eval=TRUE,echo=FALSE}
+plot_trace_af
+```
+
+``` {r  fig.height=4, fig.width=6.5, warning=FALSE, eval=TRUE,echo=FALSE}
+plot_trace_both
+```
+
+

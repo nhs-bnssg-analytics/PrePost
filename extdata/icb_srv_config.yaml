@@ -1,0 +1,10 @@
+---
+driver: "SQL server"
+server: "Xsw-00-ash01"
+host: "Xsw-00-ash01"
+# user: "test_mysql_user"
+trusted_connection: True
+# port,1433
+# host,localhost
+# database,ABI
+
