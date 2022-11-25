@@ -16,7 +16,7 @@ You can install the development version of PrePost from
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("nicksunderland/PrePost")
+devtools::install_github("nhs-bnssg-analytics/PrePost")
 ```
 
 ## Example
@@ -34,3 +34,5 @@ x <- PrePost(nhs_number       = c("441", "720", "962"),
 
 run_descriptives(x)
 ```
+
+Visit: <https://nhs-bnssg-analytics.github.io/PrePost/>
