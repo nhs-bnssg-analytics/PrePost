@@ -6,6 +6,9 @@
 \usage{
 \S4method{run_descriptives}{PrePost}(x)
 }
+\arguments{
+\item{PrePost}{PrePost object}
+}
 \value{
 a figure
 }
