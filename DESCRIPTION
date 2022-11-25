@@ -14,7 +14,14 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.2
 Imports: 
     dplyr,
-    ggplot2
+    ggplot2,
+    icdb,
+    magrittr,
+    methods,
+    rlang,
+    scales,
+    stringr,
+    tidyr
 Remotes:
     jrs0/icdb
 Suggests: 

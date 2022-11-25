@@ -19,7 +19,7 @@ PrePost <- setClass(
     window_post = "numeric",
     window_units = "character",
     activity_coverage = "list",
-    svr = "server"
+    svr_name = "character"
   ),
 
   prototype = list(
@@ -29,7 +29,7 @@ PrePost <- setClass(
     window_post = 48,
     window_units = "days",
     activity_coverage = list(),
-    svr = icdb::server("XSW")
+    svr_name = "XSW"
   )
 )
 
@@ -56,8 +56,12 @@ setMethod("set_window", "PrePost", function(x, pre, post, units="days") {
 setGeneric("run_descriptives", function(x) standardGeneric("run_descriptives"))
 #' Title
 #'
-#' @param PrePost
+#' @param PrePost PrePost object
 #' @importFrom magrittr %>%
+#' @importFrom methods callNextMethod new validObject
+#' @importFrom stats na.omit
+#' @importFrom rlang .data
+#' @importFrom icdb server
 #' @return a figure
 #' @export
 #'
@@ -71,15 +75,17 @@ setMethod("run_descriptives", "PrePost", function(x) {
                       "index_event_time" = x@index_event_time) %>%
     dplyr::mutate(instance_id=1:nrow(.))
 
+  # The server
+  svr <- icdb::server(x@svr_name)
 
-  cohort_atts <- x@svr$MODELLING_SQL_AREA$primary_care_attributes %>%
-    dplyr::select(nhs_number,age,sex,lsoa,attribute_period) %>%
+  cohort_atts <- svr$MODELLING_SQL_AREA$primary_care_attributes %>%
+    dplyr::select(.data$nhs_number,.data$age,.data$sex,.data$lsoa,.data$attribute_period) %>%
     dplyr::filter(.data$nhs_number %in% !!x@nhs_number) %>%
     icdb::run()
 
-  cohort_imd <- x@svr$Analyst_SQL_Area$tbl_BNSSG_Datasets_LSOA_IMD_2019 %>%
-    dplyr::select(imd = `Index of Multiple Deprivation (IMD) Decile`,
-                  lsoa = `LSOA Code`) %>%
+  cohort_imd <- svr$Analyst_SQL_Area$tbl_BNSSG_Datasets_LSOA_IMD_2019 %>%
+    dplyr::select(imd = .data$`Index of Multiple Deprivation (IMD) Decile`,
+                  lsoa = .data$`LSOA Code`) %>%
     dplyr::filter(.data$lsoa %in% !!cohort_atts$lsoa) %>%
     icdb::run()
 
@@ -91,7 +97,7 @@ setMethod("run_descriptives", "PrePost", function(x) {
     dplyr::left_join(cohort_imd,by="lsoa") %>%
     dplyr::select(-lsoa)
 
-  cohort_cms <- x@svr$MODELLING_SQL_AREA$New_Cambridge_Score %>%
+  cohort_cms <- svr$MODELLING_SQL_AREA$New_Cambridge_Score %>%
     dplyr::select(nhs_number,attribute_period,segment) %>%
     dplyr::filter(.data$nhs_number %in% !!x@nhs_number) %>%
     icdb::run()
@@ -99,23 +105,23 @@ setMethod("run_descriptives", "PrePost", function(x) {
   cohort_atts2<- cohort %>%
     dplyr::left_join(cohort_atts1,by="nhs_number") %>%
     dplyr::mutate(dplyr::across(c("age","sex","imd"),as.factor)) %>%
-    tidyr::pivot_longer(cols=c(age,sex,imd),names_to="metric",values_to="value") %>%
-    dplyr::mutate(diff=abs(difftime(index_event_time,attribute_period,units="days"))) %>%
+    tidyr::pivot_longer(cols=c(.data$age,.data$sex,.data$imd),names_to="metric",values_to="value") %>%
+    dplyr::mutate(diff=abs(difftime(.data$index_event_time,.data$attribute_period,units="days"))) %>%
     dplyr::group_by(.data$instance_id,.data$metric) %>%
-    dplyr::filter(!is.na(value)) %>%
+    dplyr::filter(!is.na(.data$value)) %>%
     dplyr::arrange(diff) %>%
     dplyr::slice(1) %>%
-    tidyr::pivot_wider(names_from=metric,values_from=value) %>%
+    tidyr::pivot_wider(names_from=.data$metric,values_from=.data$value) %>%
     dplyr::select(-c(attribute_period,diff)) %>%
     dplyr::left_join(cohort_cms,by="nhs_number") %>%
     dplyr::mutate(diff=abs(difftime(.data$index_event_time,.data$attribute_period,units="days"))) %>%
     dplyr::group_by(.data$instance_id) %>%
-    dplyr::filter(!is.na(segment)) %>%
+    dplyr::filter(!is.na(.data$segment)) %>%
     dplyr::arrange(diff) %>%
     dplyr::slice(1) %>%
     dplyr::select(-c(attribute_period,diff)) %>%
     na.omit() %>%
-    dplyr::filter(sex %in% c("Male","Female")) %>%
+    dplyr::filter(.data$sex %in% c("Male","Female")) %>%
     dplyr::ungroup() %>%
     dplyr::select(nhs_number,instance_id,age,imd,sex,segment) %>%
     dplyr::mutate(grp="Patients in cohort")
@@ -126,23 +132,23 @@ setMethod("run_descriptives", "PrePost", function(x) {
   ##########
   # for general popn
 
-  popn_atts <- x@svr$MODELLING_SQL_AREA$swd_attribute %>%
+  popn_atts <- svr$MODELLING_SQL_AREA$swd_attribute %>%
     dplyr::select(nhs_number,age,sex,lsoa) %>%
     icdb::run()
 
-  popn_imd <- x@svr$Analyst_SQL_Area$tbl_BNSSG_Datasets_LSOA_IMD_2019 %>%
-    dplyr::select(imd = `Index of Multiple Deprivation (IMD) Decile`,
-                  lsoa = `LSOA Code`) %>%
+  popn_imd <- svr$Analyst_SQL_Area$tbl_BNSSG_Datasets_LSOA_IMD_2019 %>%
+    dplyr::select(imd = .data$`Index of Multiple Deprivation (IMD) Decile`,
+                  lsoa = .data$`LSOA Code`) %>%
     icdb::run()
 
   popn_atts1<-popn_atts %>%
-    dplyr::mutate(lsoa=toupper(lsoa)) %>%
+    dplyr::mutate(lsoa=toupper(.data$lsoa)) %>%
     dplyr::left_join(popn_imd,by="lsoa") %>%
     dplyr::select(-lsoa)
 
-  popn_cms <- x@svr$MODELLING_SQL_AREA$New_Cambridge_Score %>%
+  popn_cms <- svr$MODELLING_SQL_AREA$New_Cambridge_Score %>%
     dplyr::select(nhs_number,attribute_period,segment) %>%
-    dplyr::filter(attribute_period == max(attribute_period, na.rm=TRUE)) %>%
+    dplyr::filter(attribute_period == max(.data$attribute_period, na.rm=TRUE)) %>%
     dplyr::select(-attribute_period) %>%
     icdb::run()
 
@@ -150,7 +156,7 @@ setMethod("run_descriptives", "PrePost", function(x) {
     dplyr::left_join(popn_cms,by="nhs_number") %>%
     dplyr::select(-nhs_number) %>%
     dplyr::mutate(grp="General BNSSG population") %>%
-    dplyr::mutate(across(c("age","sex","imd"),as.factor)) %>%
+    dplyr::mutate(dplyr::across(c("age","sex","imd"),as.factor)) %>%
     dplyr::mutate(sex=stringr::str_to_title(sex)) %>%
     dplyr::filter(sex %in% c("Male","Female")) %>%
     na.omit()
@@ -161,56 +167,56 @@ setMethod("run_descriptives", "PrePost", function(x) {
   # join
 
   descr<-rbind(cohort_atts2 %>% dplyr::select(-c(nhs_number,instance_id)), popn_atts2) %>%
-    dplyr::mutate(grp=factor(grp,levels=c("Patients in cohort","General BNSSG population")))
+    dplyr::mutate(grp=factor(.data$grp,levels=c("Patients in cohort","General BNSSG population")))
 
   descr_age<-descr %>%
-    dplyr::mutate(age=as.numeric(age)) %>%
-    dplyr::mutate(age=dplyr::case_when(age<10 ~'0-9',
-                         age>=10 & age<20 ~'-19',
-                         age>=20 & age<30  ~'20s',
-                         age>=30 & age<40  ~'30s',
-                         age>=40 & age<50  ~'40s',
-                         age>=50 & age<60  ~'50s',
-                         age>=60 & age<70  ~'60s',
-                         age>=70 & age<80  ~'70s',
-                         age>=80 & age<90  ~'80s',
+    dplyr::mutate(age=as.numeric(.data$age)) %>%
+    dplyr::mutate(age=dplyr::case_when(.data$age<10 ~'0-9',
+                                       .data$age>=10 & .data$age<20 ~'-19',
+                                       .data$age>=20 & .data$age<30  ~'20s',
+                                       .data$age>=30 & .data$age<40  ~'30s',
+                                       .data$age>=40 & .data$age<50  ~'40s',
+                                       .data$age>=50 & .data$age<60  ~'50s',
+                                       .data$age>=60 & .data$age<70  ~'60s',
+                                       .data$age>=70 & .data$age<80  ~'70s',
+                                       .data$age>=80 & .data$age<90  ~'80s',
                          TRUE  ~'90+')) %>%
-    dplyr::group_by(grp,age) %>%
-    dplyr::summarise(prop=n()) %>%
-    dplyr::group_by(grp) %>%
-    dplyr::mutate(prop=prop/sum(prop)) %>%
+    dplyr::group_by(.data$grp,.data$age) %>%
+    dplyr::summarise(prop=dplyr::n()) %>%
+    dplyr::group_by(.data$grp) %>%
+    dplyr::mutate(prop=.data$prop/sum(.data$prop)) %>%
     dplyr::mutate(metric="Age") %>%
     dplyr::rename("xval"="age") %>%
-    dplyr::mutate(xval=factor(xval,levels=c('0-9','-19','20s','30s','40s',
+    dplyr::mutate(xval=factor(.data$xval,levels=c('0-9','-19','20s','30s','40s',
                                      '50s','60s','70s','80s','90+')))
 
   descr_sex<-descr %>%
-    dplyr::group_by(grp,sex) %>%
-    dplyr::summarise(prop=n()) %>%
-    dplyr::group_by(grp) %>%
-    dplyr::mutate(prop=prop/sum(prop)) %>%
+    dplyr::group_by(.data$grp,.data$sex) %>%
+    dplyr::summarise(prop=dplyr::n()) %>%
+    dplyr::group_by(.data$grp) %>%
+    dplyr::mutate(prop=.data$prop/sum(.data$prop)) %>%
     dplyr::mutate(metric="Sex") %>%
     dplyr::rename("xval"="sex")
 
   descr_imd<-descr %>%
-    dplyr::group_by(grp,imd) %>%
-    dplyr::summarise(prop=n()) %>%
-    dplyr::group_by(grp) %>%
-    dplyr::mutate(prop=prop/sum(prop)) %>%
+    dplyr::group_by(.data$grp,.data$imd) %>%
+    dplyr::summarise(prop=dplyr::n()) %>%
+    dplyr::group_by(.data$grp) %>%
+    dplyr::mutate(prop=.data$prop/sum(.data$prop)) %>%
     dplyr::mutate(metric="IMD Decile") %>%
     dplyr::rename("xval"="imd")
 
   descr_segment<-descr %>%
-    dplyr::group_by(grp,segment) %>%
-    dplyr::summarise(prop=n()) %>%
-    dplyr::group_by(grp) %>%
-    dplyr::mutate(prop=prop/sum(prop)) %>%
+    dplyr::group_by(.data$grp,.data$segment) %>%
+    dplyr::summarise(prop=dplyr::n()) %>%
+    dplyr::group_by(.data$grp) %>%
+    dplyr::mutate(prop=.data$prop/sum(.data$prop)) %>%
     dplyr::mutate(metric="Core Segment") %>%
     dplyr::rename("xval"="segment") %>%
-    dplyr::mutate(xval=factor(xval,levels=c("1","2","3","4","5")))
+    dplyr::mutate(xval=factor(.data$xval,levels=c("1","2","3","4","5")))
 
   descr_plot<-rbind(descr_age,descr_sex,descr_imd,descr_segment) %>%
-    dplyr::mutate(metric=factor(metric,levels=c("Age","Sex","IMD Decile","Core Segment"))) %>%
+    dplyr::mutate(metric=factor(.data$metric,levels=c("Age","Sex","IMD Decile","Core Segment"))) %>%
     ggplot2::ggplot(ggplot2::aes(x=xval,y=prop,fill=grp)) +
     ggplot2::geom_bar(stat="identity",position="dodge") +
     ggplot2::facet_wrap(~metric,scales="free") +
