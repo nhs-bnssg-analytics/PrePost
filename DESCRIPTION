@@ -28,4 +28,4 @@ Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
-URL: https://nicksunderland.github.io/PrePost/
+URL: https://nhs-bnssg-analytics.github.io/PrePost/
