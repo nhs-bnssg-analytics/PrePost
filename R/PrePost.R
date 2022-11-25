@@ -141,6 +141,7 @@ setMethod("run_descriptives", "PrePost", function(x) {
                   lsoa = .data$`LSOA Code`) %>%
     icdb::run()
 
+
   popn_atts1<-popn_atts %>%
     dplyr::mutate(lsoa=toupper(.data$lsoa)) %>%
     dplyr::left_join(popn_imd,by="lsoa") %>%
