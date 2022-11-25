@@ -26,7 +26,7 @@ You can install the development version of PrePost from [GitHub](https://github.
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("nicksunderland/PrePost")
+devtools::install_github("nhs-bnssg-analytics/PrePost")
 ```
 
 ## Example
