@@ -2,6 +2,11 @@
 
 export(PrePost)
 exportClasses(PrePost)
+exportMethods(analyse)
+exportMethods(generate_theographs)
+exportMethods(generate_trace_plots)
+exportMethods(run_activity_summary)
+exportMethods(run_activity_volume)
 exportMethods(run_descriptives)
 importFrom(icdb,server)
 importFrom(magrittr,"%>%")
