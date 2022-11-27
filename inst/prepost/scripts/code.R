@@ -143,7 +143,7 @@ popn_atts2<-popn_atts1 %>%
   mutate(sex=str_to_title(sex)) %>%
   filter(sex %in% c("Male","Female")) %>%
   na.omit()
-  
+
 rm(popn_atts,popn_atts1,popn_imd,popn_cms)
 
 ##########
@@ -187,7 +187,7 @@ descr_imd<-descr %>%
   group_by(grp) %>%
   mutate(prop=prop/sum(prop)) %>%
   mutate(metric="IMD Decile") %>%
-  rename("xval"="imd") 
+  rename("xval"="imd")
 
 descr_segment<-descr %>%
   group_by(grp,segment) %>%
@@ -221,7 +221,7 @@ tbl0<-expand.grid(instance_id=cohort$instance_id,activity_name=activity_coverage
               summarise(bf=sum(activity_time<index_event_time),af=sum(activity_time>index_event_time)),
             by=c("instance_id","activity_name")) %>%
   replace(is.na(.),0)
-  
+
 tbl_summ_bf<-tbl0 %>%
   group_by(activity_name) %>%
   summarise(`Mean activity per instance`=round(mean(bf),digits=2),
@@ -229,12 +229,20 @@ tbl_summ_bf<-tbl0 %>%
             `Mean activity per instance with >0 activity`=round(mean(bf[bf>0]),digits=2)) %>%
   rename("Activity"="activity_name")
 
+kable(tbl_summ_bf,caption="Summary of activity volumes BEFORE the index event",
+      align=c("l","r","r","r"))
+
+
+
 tbl_summ_af<-tbl0 %>%
   group_by(activity_name) %>%
   summarise(`Mean activity per instance`=round(mean(af),digits=2),
             `Instances with >0 activity`=paste0(round(100*sum(af>0)/n(),digits=1),"%"),
             `Mean activity per instance with >0 activity`=round(mean(af[af>0]),digits=2)) %>%
   rename("Activity"="activity_name")
+
+kable(tbl_summ_af,caption="Summary of activity volumes AFTER the index event",
+      align=c("l","r","r","r"))
 
 print(paste0("Finished activity summary tables..."),quote=FALSE)
 
@@ -278,7 +286,7 @@ theo_plot<-dat_theo %>%
         legend.position="bottom",
         legend.title=element_blank()) #+
   #guides(colour=guide_legend(ncol=1),shape=guide_legend(ncol=1))
-  
+
 ################
 # full
 
@@ -378,7 +386,7 @@ trace_fn<-function(dat,period) {
              activity_id="activity_name",
              activity_instance_id="activity_instance_id",
              resource_id="resource_id",
-             lifecycle_id="lifecycle_id", 
+             lifecycle_id="lifecycle_id",
              timestamp="activity_time")
 }
 
@@ -406,7 +414,7 @@ print(
     scale_fill_manual(values=1:(length(activity_coverage$activity_name)+1),drop=FALSE) +
     theme(legend.position="bottom",
           legend.title=element_blank(),
-          axis.title.x=element_blank()) 
+          axis.title.x=element_blank())
 )
 dev.off()
 
@@ -423,7 +431,7 @@ plot_trace_af<-dat_trace_af %>%
   theme(legend.position="bottom",
         legend.title=element_blank(),
         axis.title.y=element_text(face="italic"),
-        axis.title.x=element_blank()) 
+        axis.title.x=element_blank())
 
 pdf(paste0(getwd(),"/",systime_clean,"/trace_after_full.pdf"),height=12,width=8)
 print(
@@ -434,7 +442,7 @@ print(
     scale_fill_manual(values=1:(length(activity_coverage$activity_name)+1),drop=FALSE) +
     theme(legend.position="bottom",
           legend.title=element_blank(),
-        axis.title.x=element_blank()) 
+        axis.title.x=element_blank())
 )
 dev.off()
 
@@ -451,7 +459,7 @@ plot_trace_both<-dat_trace_both %>%
   theme(legend.position="bottom",
         legend.title=element_blank(),
         axis.title.y=element_text(face="italic"),
-        axis.title.x=element_blank()) 
+        axis.title.x=element_blank())
 
 pdf(paste0(getwd(),"/",systime_clean,"/trace_both_full.pdf"),height=12,width=8)
 print(
@@ -462,8 +470,8 @@ print(
     scale_fill_manual(values=1:(length(activity_coverage$activity_name)+1),drop=FALSE) +
     theme(legend.position="bottom",
           legend.title=element_blank(),
-          axis.title.x=element_blank()) 
-) 
+          axis.title.x=element_blank())
+)
 dev.off()
 
 print(paste0("Finished trace-plots..."),quote=FALSE)
