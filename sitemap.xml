@@ -19,7 +19,22 @@
     <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/PrePost-class.html</loc>
   </url>
   <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/analyse-PrePost-method.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/generate_theographs-PrePost-method.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/generate_trace_plots-PrePost-method.html</loc>
+  </url>
+  <url>
     <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/run_activity_summary-PrePost-method.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/run_activity_volume-PrePost-method.html</loc>
   </url>
   <url>
     <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/run_descriptives-PrePost-method.html</loc>
