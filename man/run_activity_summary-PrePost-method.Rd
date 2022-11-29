@@ -4,13 +4,15 @@
 \alias{run_activity_summary,PrePost-method}
 \title{run_activity_summary}
 \usage{
-\S4method{run_activity_summary}{PrePost}(x)
+\S4method{run_activity_summary}{PrePost}(x, period = "bf")
 }
 \arguments{
+\item{period}{either bf or af (before or after)}
+
 \item{PrePost}{PrePost object}
 }
 \value{
-a figure
+a table
 }
 \description{
 run_activity_summary

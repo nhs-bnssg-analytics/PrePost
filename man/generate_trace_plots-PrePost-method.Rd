@@ -4,9 +4,11 @@
 \alias{generate_trace_plots,PrePost-method}
 \title{generate_trace_plots}
 \usage{
-\S4method{generate_trace_plots}{PrePost}(x)
+\S4method{generate_trace_plots}{PrePost}(x, period)
 }
 \arguments{
+\item{period}{before, after or both}
+
 \item{PrePost}{PrePost object}
 }
 \value{
