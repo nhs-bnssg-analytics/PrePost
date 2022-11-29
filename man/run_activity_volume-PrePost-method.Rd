@@ -4,13 +4,15 @@
 \alias{run_activity_volume,PrePost-method}
 \title{run_activity_volume}
 \usage{
-\S4method{run_activity_volume}{PrePost}(x)
+\S4method{run_activity_volume}{PrePost}(x, period)
 }
 \arguments{
+\item{period}{af bf or both}
+
 \item{PrePost}{PrePost object}
 }
 \value{
-a figure
+a table
 }
 \description{
 run_activity_volume

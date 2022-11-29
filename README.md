@@ -27,7 +27,7 @@ This is a basic example which shows you how to solve a common problem:
 library(PrePost)
 
 x <- PrePost(nhs_number       = c("441", "720", "962"),
-             index_event_time = structure(c(164, 164, 165, class = c("POSIXct",  "POSIXt"), tzone = "GMT")),
+             index_event_time = as.POSIXct(c("2000-10-10", "2000-10-10", "2000-10-10"), tz="GMT"),
              window_pre       = 31,
              window_post      = 30, 
              window_units     = "days")
