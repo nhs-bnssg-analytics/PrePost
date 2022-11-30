@@ -20,7 +20,7 @@ PrePost <- setClass(
     window_units = "character",
     activity_coverage = "list",
     svr_name = "character",
-    svr = "server"
+    svr = "list"
   ),
 
   prototype = list(
@@ -30,13 +30,17 @@ PrePost <- setClass(
     window_post = 48,
     window_units = "days",
     activity_coverage = list(),
-    svr_name = "XSW"
+    svr_name = "XSW",
+    svr = list()
   )
 )
 
 setMethod("initialize", "PrePost", function(.Object, ...) {
   .Object <- callNextMethod()
-  .Object@svr <- icdb::server(.Object@svr_name)
+  if(length(.Object@svr)==0)
+  {
+    .Object@svr <- icdb::server(.Object@svr_name)
+  }
   validObject(.Object)
   .Object
 })
@@ -110,90 +114,44 @@ gen_dat2 <- function(x){
   return(dat2)
 }
 
-dat_theo <- function(x){
-
-  cohort <- gen_cohort(x)
-  dat2 <- gen_dat2(x)
-
-  dat_theo<-dat2 %>%
-    dplyr::mutate(activity_time_diff=as.numeric(difftime(.data$activity_time, .data$index_event_time, units="days"))) %>%
-    dplyr::select(-c(.data$index_event_time, .data$activity_time)) %>%
-    dplyr::bind_rows(cohort %>%
-                       dplyr::mutate(activity_name="Index event") %>%
-                       dplyr::rename(activity_time_diff=.data$index_event_time) %>%
-                       dplyr::mutate(activity_time_diff=0)) %>%
-    dplyr::mutate(activity_name=factor(.data$activity_name,levels=c("Index event",x@activity_coverage$activity_name)))
-
-  return(dat_theo)
-}
-
-gen_tbl0 <- function(x){
-
-  dat2 <- gen_dat2(x)
-
-  tbl0<-expand.grid(instance_id=1:length(x@nhs_number), activity_name=x@activity_coverage$activity_name) %>%
-    dplyr::left_join(dat2 %>%
-                       dplyr::group_by(.data$instance_id, .data$activity_name) %>%
-                       dplyr::summarise(bf=sum(.data$activity_time<.data$index_event_time),
-                                        af=sum(.data$activity_time>.data$index_event_time)),
-              by=c("instance_id","activity_name")) %>%
-    replace(is.na(.),0)
-
-  return(tbl0)
-}
-
-gen_attr <- function(x, filter_ids=FALSE){
-
-  atts <- x@svr$MODELLING_SQL_AREA$primary_care_attributes %>%
-    dplyr::select(.data$nhs_number,.data$age,.data$sex,.data$lsoa,.data$attribute_period) %>%
-    {if(all(.data$ids==TRUE)) dplyr::filter(., .data$nhs_number %in% !!x@nhs_number) else .} %>%
-    icdb::run()
-
-  imd <- x@svr$Analyst_SQL_Area$tbl_BNSSG_Datasets_LSOA_IMD_2019 %>%
-    dplyr::select(imd = .data$`Index of Multiple Deprivation (IMD) Decile`,
-                  lsoa = .data$`LSOA Code`) %>%
-    {if(all(.data$ids==TRUE)) dplyr::filter(., .data$lsoa %in% !!atts$lsoa) else .} %>%
-    icdb::run()
-
-  atts1<-atts %>%
-    dplyr::mutate(lsoa=toupper(.data$lsoa)) %>%
-    dplyr::left_join(imd, by="lsoa") %>%
-    dplyr::select(-.data$lsoa)
-
-  return(atts1)
-}
-
-trace_fn <- function(dat2,period) {
-
-  dat2 <- dat2 %>%
-    dplyr::select(-.data$nhs_number) %>%
-    dplyr::filter(if(period=="before") .data$activity_time_diff<=0 else .data$activity_time_diff<Inf) %>%
-    dplyr::filter(if(period=="after") .data$activity_time_diff>=0 else .data$activity_time_diff<Inf) %>%
-    dplyr::mutate(activity_time=as.POSIXct("1990-01-01")+lubridate::seconds(round(.data$activity_time_diff*3600))) %>%
-    dplyr::mutate(lifecycle_id="complete") %>%
-    dplyr::group_by(.data$instance_id) %>%
-    dplyr::arrange(.data$activity_time, by_group=TRUE) %>%
-    dplyr::mutate(instance_id2=dplyr::row_number(),
-                  n_actv=dplyr::n()) %>%
-    dplyr::group_by(.data$instance_id, .data$activity_name, .data$instance_id2, .data$lifecycle_id) %>%
-    dplyr::arrange(.data$activity_time, by_group=TRUE) %>%
-    dplyr::mutate(activity_instance_id=dplyr::cur_group_id()) %>%
-    dplyr::mutate(resource_id="blank") %>%
-    bupaR::eventlog(case_id="instance_id",
-             activity_id="activity_name",
-             activity_instance_id="activity_instance_id",
-             resource_id="resource_id",
-             lifecycle_id="lifecycle_id",
-             timestamp="activity_time")
-
-  return(dat2)
-}
-
 cohort_atts <- function(x){
 
   # The data
   cohort <- gen_cohort(x)
+
+
+
+  con<-odbcDriverConnect("driver={SQL Server};\n  server=Xsw-00-ash01;\n  trusted_connection=true")
+  string_attribute_cohort<-paste("select nhs_number,age,sex,lsoa,attribute_period
+  from MODELLING_SQL_AREA.dbo.primary_care_attributes
+  where nhs_number in (",toString(cohort$nhs_number),")
+")
+  cohort_atts<-sqlQuery(con,string_attribute_cohort)
+  close(con)
+
+  # insetad of
+
   cohort_atts1<-gen_attr(x, filter_ids=TRUE)
+  # atts <- x@svr$MODELLING_SQL_AREA$primary_care_attributes %>%
+  #   dplyr::select(.data$nhs_number,.data$age,.data$sex,.data$lsoa,.data$attribute_period) %>%
+  #   {if(filter_ids) dplyr::filter(., .data$nhs_number %in% !!x@nhs_number) else .} %>%
+  #   icdb::run()
+  #
+  # imd <- x@svr$Analyst_SQL_Area$tbl_BNSSG_Datasets_LSOA_IMD_2019 %>%
+  #   dplyr::select(imd = .data$`Index of Multiple Deprivation (IMD) Decile`,
+  #                 lsoa = .data$`LSOA Code`) %>%
+  #   {if(filter_ids==TRUE) dplyr::filter(., .data$lsoa %in% !!atts$lsoa) else .} %>%
+  #   icdb::run()
+  #
+  # atts1<-atts %>%
+  #   dplyr::mutate(lsoa=toupper(.data$lsoa)) %>%
+  #   dplyr::left_join(imd, by="lsoa") %>%
+  #   dplyr::select(-.data$lsoa)
+
+
+
+
+
 
   cohort_cms <- x@svr$MODELLING_SQL_AREA$New_Cambridge_Score %>%
     dplyr::select(.data$nhs_number, .data$attribute_period, .data$segment) %>%
@@ -230,7 +188,38 @@ cohort_atts <- function(x){
 popn_atts <- function(x){
   ##########
   # for general popn
+
+  con<-odbcDriverConnect("driver={SQL Server};\n  server=Xsw-00-ash01;\n  trusted_connection=true")
+  string_attribute_popn<-paste("select nhs_number,age,sex,lsoa
+  from MODELLING_SQL_AREA.dbo.swd_attribute
+")
+  popn_atts<-sqlQuery(con,string_attribute_popn)
+  close(con)
+
+
+  #instead of
+
   popn_atts1<-gen_attr(x, filter_ids=FALSE)
+  # atts <- x@svr$MODELLING_SQL_AREA$primary_care_attributes %>%
+  #   dplyr::select(.data$nhs_number,.data$age,.data$sex,.data$lsoa,.data$attribute_period) %>%
+  #   {if(filter_ids) dplyr::filter(., .data$nhs_number %in% !!x@nhs_number) else .} %>%
+  #   icdb::run()
+  #
+  # imd <- x@svr$Analyst_SQL_Area$tbl_BNSSG_Datasets_LSOA_IMD_2019 %>%
+  #   dplyr::select(imd = .data$`Index of Multiple Deprivation (IMD) Decile`,
+  #                 lsoa = .data$`LSOA Code`) %>%
+  #   {if(filter_ids==TRUE) dplyr::filter(., .data$lsoa %in% !!atts$lsoa) else .} %>%
+  #   icdb::run()
+  #
+  # atts1<-atts %>%
+  #   dplyr::mutate(lsoa=toupper(.data$lsoa)) %>%
+  #   dplyr::left_join(imd, by="lsoa") %>%
+  #   dplyr::select(-.data$lsoa)
+
+
+
+
+
 
   popn_cms <- x@svr$MODELLING_SQL_AREA$New_Cambridge_Score %>%
     dplyr::select(.data$nhs_number, .data$attribute_period, .data$segment) %>%
@@ -249,6 +238,65 @@ popn_atts <- function(x){
 
   return(popn_atts2)
 }
+
+dat_theo <- function(x){
+
+  cohort <- gen_cohort(x)
+  dat2 <- gen_dat2(x)
+
+  dat_theo<-dat2 %>%
+    dplyr::mutate(activity_time_diff=as.numeric(difftime(.data$activity_time, .data$index_event_time, units="days"))) %>%
+    dplyr::select(-c(.data$index_event_time, .data$activity_time)) %>%
+    dplyr::bind_rows(cohort %>%
+                       dplyr::mutate(activity_name="Index event") %>%
+                       dplyr::rename(activity_time_diff=.data$index_event_time) %>%
+                       dplyr::mutate(activity_time_diff=0)) %>%
+    dplyr::mutate(activity_name=factor(.data$activity_name,levels=c("Index event",x@activity_coverage$activity_name)))
+
+  return(dat_theo)
+}
+
+gen_tbl0 <- function(x){
+
+  dat2 <- gen_dat2(x)
+
+  tbl0<-expand.grid(instance_id=1:length(x@nhs_number), activity_name=x@activity_coverage$activity_name) %>%
+    dplyr::left_join(dat2 %>%
+                       dplyr::group_by(.data$instance_id, .data$activity_name) %>%
+                       dplyr::summarise(bf=sum(.data$activity_time<.data$index_event_time),
+                                        af=sum(.data$activity_time>.data$index_event_time)),
+              by=c("instance_id","activity_name")) %>%
+    replace(is.na(.),0)
+
+  return(tbl0)
+}
+
+trace_fn <- function(dat2,period) {
+
+  dat2 <- dat2 %>%
+    dplyr::select(-.data$nhs_number) %>%
+    dplyr::filter(if(period=="before") .data$activity_time_diff<=0 else .data$activity_time_diff<Inf) %>%
+    dplyr::filter(if(period=="after") .data$activity_time_diff>=0 else .data$activity_time_diff<Inf) %>%
+    dplyr::mutate(activity_time=as.POSIXct("1990-01-01")+lubridate::seconds(round(.data$activity_time_diff*3600))) %>%
+    dplyr::mutate(lifecycle_id="complete") %>%
+    dplyr::group_by(.data$instance_id) %>%
+    dplyr::arrange(.data$activity_time, by_group=TRUE) %>%
+    dplyr::mutate(instance_id2=dplyr::row_number(),
+                  n_actv=dplyr::n()) %>%
+    dplyr::group_by(.data$instance_id, .data$activity_name, .data$instance_id2, .data$lifecycle_id) %>%
+    dplyr::arrange(.data$activity_time, by_group=TRUE) %>%
+    dplyr::mutate(activity_instance_id=dplyr::cur_group_id()) %>%
+    dplyr::mutate(resource_id="blank") %>%
+    bupaR::eventlog(case_id="instance_id",
+             activity_id="activity_name",
+             activity_instance_id="activity_instance_id",
+             resource_id="resource_id",
+             lifecycle_id="lifecycle_id",
+             timestamp="activity_time")
+
+  return(dat2)
+}
+
 
 setGeneric("run_descriptives", function(x) standardGeneric("run_descriptives"))
 #' Title

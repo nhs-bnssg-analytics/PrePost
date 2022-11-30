@@ -1,0 +1,66 @@
+---
+title: "descriptives"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{descriptives}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>", 
+  eval = FALSE
+)
+```
+
+# Connecting to the database
+
+First, generate the artificial data (sqlite files for each database), as follows:
+```{r setup}
+library(PrePost)
+# generate example databases
+prepost_example()
+```
+
+This will create a folder called gendata in your working directory, containing the database files
+for the example cohort. Next, you can connect to this databases using:
+
+```{r connect}
+library(PrePost)
+library(dplyr)
+library(icdb)
+
+# connect to ICB server using this
+# srv <- icdb::server("[data_source_name]"])  #see ICDB documentation for details
+
+# in this example we can connect to the synthetic data using
+srv <- example_server()
+```
+
+Define the cohort - here an example cohort is provided on the example server. All we need is the
+(pseudo) NHS number and the datetime of interest.
+```{r cohort}
+ids  <- srv$cohort$COHORT_SYNTH %>% select(nhs_number) %>% pull()
+date <- srv$cohort$COHORT_SYNTH %>% select(index_event_time) %>% pull() %>% as.POSIXct()
+
+```
+
+Next we create a PrePost object, defining the window of interest. If working on the ICB servers you
+will need to pass the name of the data source as the parameter `srv_name`.
+```{r prepost_obj}
+load_all()
+obj <- PrePost(nhs_number       = ids,
+               index_event_time = date,
+               window_pre       = 31,
+               window_post      = 30, 
+               window_units     = "days",
+               svr              = example_server())
+run_descriptives(obj)
+```
+
+Run the descriptive analysis
+```{r descriptives}
+
+```
