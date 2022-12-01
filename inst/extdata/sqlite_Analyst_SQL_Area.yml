@@ -1,0 +1,3 @@
+---
+"driver": "sqlite"
+"dbfile": "gendata/Analyst_SQL_Area.db"
