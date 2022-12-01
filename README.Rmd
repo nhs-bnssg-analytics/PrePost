@@ -31,18 +31,4 @@ devtools::install_github("nhs-bnssg-analytics/PrePost")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
-
-```{r example, eval=FALSE}
-library(PrePost)
-
-x <- PrePost(nhs_number       = c("441", "720", "962"),
-             index_event_time = as.POSIXct(c("2000-10-10", "2000-10-10", "2000-10-10"), tz="GMT"),
-             window_pre       = 31,
-             window_post      = 30, 
-             window_units     = "days")
-
-run_descriptives(x)
-```
-
 Visit: https://nhs-bnssg-analytics.github.io/PrePost/
