@@ -55,7 +55,7 @@ date <- srv$cohort$COHORT_SYNTH %>% select(index_event_time) %>% pull() %>% as.P
 
 Next we create a PrePost object, defining the window of interest. If working on the ICB servers you
 will need to pass the name of the data source as the parameter `srv_name`.
-```{r prepost_obj, include=FALSE}
+```{r prepost_obj}
 obj <- PrePost(nhs_number       = ids,
                index_event_time = date,
                window_pre       = 31,
