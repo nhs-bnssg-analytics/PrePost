@@ -99,10 +99,17 @@ interest.</p>
 <p>Next we create a PrePost object, defining the window of interest. If
 working on the ICB servers you will need to pass the name of the data
 source as the parameter <code>srv_name</code>.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/PrePost-class.html">PrePost</a></span><span class="op">(</span>nhs_number       <span class="op">=</span> <span class="va">ids</span>,</span>
+<span>               index_event_time <span class="op">=</span> <span class="va">date</span>,</span>
+<span>               window_pre       <span class="op">=</span> <span class="fl">31</span>,</span>
+<span>               window_post      <span class="op">=</span> <span class="fl">30</span>, </span>
+<span>               window_units     <span class="op">=</span> <span class="st">"days"</span>,</span>
+<span>               svr              <span class="op">=</span> <span class="fu"><a href="../reference/example_server.html">example_server</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Run the descriptive analysis</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">run_descriptives</span>(obj)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="cn">FALSE</span> [<span class="dv">1</span>] Running descriptive summary of cohort...</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="cn">FALSE</span> [<span class="dv">1</span>] Finished descriptive summary of cohort...</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">run_descriptives</span>(obj)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cn">FALSE</span> [<span class="dv">1</span>] Running descriptive summary of cohort...</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="cn">FALSE</span> [<span class="dv">1</span>] Finished descriptive summary of cohort...</span></code></pre></div>
 <p><img src="PrePost_files/figure-html/descriptives-1.png" width="672"></p>
 </div>
   </main>
