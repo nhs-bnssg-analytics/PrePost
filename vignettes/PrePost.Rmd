@@ -1,8 +1,8 @@
 ---
-title: "descriptives"
+title: "PrePost"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{descriptives}
+  %\VignetteIndexEntry{PrePost}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
