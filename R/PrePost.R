@@ -119,39 +119,21 @@ cohort_atts <- function(x){
   # The data
   cohort <- gen_cohort(x)
 
+  atts <- x@svr$MODELLING_SQL_AREA$primary_care_attributes %>%
+    dplyr::select(.data$nhs_number,.data$age,.data$sex,.data$lsoa,.data$attribute_period) %>%
+    dplyr::filter(.data$nhs_number %in% !!x@nhs_number) %>%
+    icdb::run()
 
+  imd <- x@svr$Analyst_SQL_Area$tbl_BNSSG_Datasets_LSOA_IMD_2019 %>%
+    dplyr::select(imd = .data$`Index of Multiple Deprivation (IMD) Decile`,
+                  lsoa = .data$`LSOA Code`) %>%
+    dplyr::filter(.data$lsoa %in% !!atts$lsoa) %>%
+    icdb::run()
 
-  con<-odbcDriverConnect("driver={SQL Server};\n  server=Xsw-00-ash01;\n  trusted_connection=true")
-  string_attribute_cohort<-paste("select nhs_number,age,sex,lsoa,attribute_period
-  from MODELLING_SQL_AREA.dbo.primary_care_attributes
-  where nhs_number in (",toString(cohort$nhs_number),")
-")
-  cohort_atts<-sqlQuery(con,string_attribute_cohort)
-  close(con)
-
-  # insetad of
-
-  cohort_atts1<-gen_attr(x, filter_ids=TRUE)
-  # atts <- x@svr$MODELLING_SQL_AREA$primary_care_attributes %>%
-  #   dplyr::select(.data$nhs_number,.data$age,.data$sex,.data$lsoa,.data$attribute_period) %>%
-  #   {if(filter_ids) dplyr::filter(., .data$nhs_number %in% !!x@nhs_number) else .} %>%
-  #   icdb::run()
-  #
-  # imd <- x@svr$Analyst_SQL_Area$tbl_BNSSG_Datasets_LSOA_IMD_2019 %>%
-  #   dplyr::select(imd = .data$`Index of Multiple Deprivation (IMD) Decile`,
-  #                 lsoa = .data$`LSOA Code`) %>%
-  #   {if(filter_ids==TRUE) dplyr::filter(., .data$lsoa %in% !!atts$lsoa) else .} %>%
-  #   icdb::run()
-  #
-  # atts1<-atts %>%
-  #   dplyr::mutate(lsoa=toupper(.data$lsoa)) %>%
-  #   dplyr::left_join(imd, by="lsoa") %>%
-  #   dplyr::select(-.data$lsoa)
-
-
-
-
-
+  cohort_atts1<-atts %>%
+    dplyr::mutate(lsoa=toupper(.data$lsoa)) %>%
+    dplyr::left_join(imd, by="lsoa") %>%
+    dplyr::select(-.data$lsoa)
 
   cohort_cms <- x@svr$MODELLING_SQL_AREA$New_Cambridge_Score %>%
     dplyr::select(.data$nhs_number, .data$attribute_period, .data$segment) %>%
@@ -189,37 +171,21 @@ popn_atts <- function(x){
   ##########
   # for general popn
 
-  con<-odbcDriverConnect("driver={SQL Server};\n  server=Xsw-00-ash01;\n  trusted_connection=true")
-  string_attribute_popn<-paste("select nhs_number,age,sex,lsoa
-  from MODELLING_SQL_AREA.dbo.swd_attribute
-")
-  popn_atts<-sqlQuery(con,string_attribute_popn)
-  close(con)
+  atts <- x@svr$MODELLING_SQL_AREA$swd_attribute %>%
+    dplyr::select(.data$nhs_number,.data$age,.data$sex,.data$lsoa) %>%
+    dplyr::filter(.data$nhs_number %in% !!x@nhs_number) %>%
+    icdb::run()
 
+  imd <- x@svr$Analyst_SQL_Area$tbl_BNSSG_Datasets_LSOA_IMD_2019 %>%
+    dplyr::select(imd  = .data$`Index of Multiple Deprivation (IMD) Decile`,
+                  lsoa = .data$`LSOA Code`) %>%
+    dplyr::filter(.data$lsoa %in% !!atts$lsoa) %>%
+    icdb::run()
 
-  #instead of
-
-  popn_atts1<-gen_attr(x, filter_ids=FALSE)
-  # atts <- x@svr$MODELLING_SQL_AREA$primary_care_attributes %>%
-  #   dplyr::select(.data$nhs_number,.data$age,.data$sex,.data$lsoa,.data$attribute_period) %>%
-  #   {if(filter_ids) dplyr::filter(., .data$nhs_number %in% !!x@nhs_number) else .} %>%
-  #   icdb::run()
-  #
-  # imd <- x@svr$Analyst_SQL_Area$tbl_BNSSG_Datasets_LSOA_IMD_2019 %>%
-  #   dplyr::select(imd = .data$`Index of Multiple Deprivation (IMD) Decile`,
-  #                 lsoa = .data$`LSOA Code`) %>%
-  #   {if(filter_ids==TRUE) dplyr::filter(., .data$lsoa %in% !!atts$lsoa) else .} %>%
-  #   icdb::run()
-  #
-  # atts1<-atts %>%
-  #   dplyr::mutate(lsoa=toupper(.data$lsoa)) %>%
-  #   dplyr::left_join(imd, by="lsoa") %>%
-  #   dplyr::select(-.data$lsoa)
-
-
-
-
-
+  popn_atts1<-atts %>%
+    dplyr::mutate(lsoa=toupper(.data$lsoa)) %>%
+    dplyr::left_join(imd, by="lsoa") %>%
+    dplyr::select(-.data$lsoa)
 
   popn_cms <- x@svr$MODELLING_SQL_AREA$New_Cambridge_Score %>%
     dplyr::select(.data$nhs_number, .data$attribute_period, .data$segment) %>%
@@ -326,7 +292,7 @@ setMethod("run_descriptives", "PrePost", function(x) {
   descr_age<-descr %>%
     dplyr::mutate(age=as.numeric(.data$age)) %>%
     dplyr::mutate(age=dplyr::case_when(.data$age<10 ~'0-9',
-                                       .data$age>=10 & .data$age<20 ~'-19',
+                                       .data$age>=10 & .data$age<20  ~'10s',
                                        .data$age>=20 & .data$age<30  ~'20s',
                                        .data$age>=30 & .data$age<40  ~'30s',
                                        .data$age>=40 & .data$age<50  ~'40s',
@@ -341,7 +307,7 @@ setMethod("run_descriptives", "PrePost", function(x) {
     dplyr::mutate(prop=.data$prop/sum(.data$prop)) %>%
     dplyr::mutate(metric="Age") %>%
     dplyr::rename("xval"="age") %>%
-    dplyr::mutate(xval=factor(.data$xval,levels=c('0-9','-19','20s','30s','40s',
+    dplyr::mutate(xval=factor(.data$xval,levels=c('0-9','10s','20s','30s','40s',
                                      '50s','60s','70s','80s','90+')))
 
   descr_sex<-descr %>%

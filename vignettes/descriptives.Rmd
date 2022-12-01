@@ -11,7 +11,12 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>", 
-  eval = FALSE
+  eval = TRUE, 
+  comment = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  error = FALSE,
+  results = "hide"
 )
 ```
 
@@ -20,6 +25,7 @@ knitr::opts_chunk$set(
 First, generate the artificial data (sqlite files for each database), as follows:
 ```{r setup}
 library(PrePost)
+
 # generate example databases
 prepost_example()
 ```
@@ -49,18 +55,16 @@ date <- srv$cohort$COHORT_SYNTH %>% select(index_event_time) %>% pull() %>% as.P
 
 Next we create a PrePost object, defining the window of interest. If working on the ICB servers you
 will need to pass the name of the data source as the parameter `srv_name`.
-```{r prepost_obj}
-load_all()
+```{r prepost_obj, include=FALSE}
 obj <- PrePost(nhs_number       = ids,
                index_event_time = date,
                window_pre       = 31,
                window_post      = 30, 
                window_units     = "days",
                svr              = example_server())
-run_descriptives(obj)
 ```
 
 Run the descriptive analysis
-```{r descriptives}
-
+```{r descriptives, results='markup', fig.dim = c(7, 5)}
+run_descriptives(obj)
 ```

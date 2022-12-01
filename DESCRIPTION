@@ -14,6 +14,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.2
 Imports: 
     bupaR,
+    DBI,
     dplyr,
     ggplot2,
     icdb,
@@ -21,8 +22,10 @@ Imports:
     magrittr,
     methods,
     rlang,
+    RSQLite,
     scales,
     stringr,
+    tibble,
     tidyr
 Remotes:
     jrs0/icdb

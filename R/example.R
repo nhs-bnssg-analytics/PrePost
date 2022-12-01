@@ -1,3 +1,9 @@
+#' Title
+#'
+#' @param digits
+#'
+#' @return d
+#' @export
 check_digit <- function(digits){
   ## Weights used in algorithm
   weights <- c(10,9,8,7,6,5,4,3,2)
@@ -9,6 +15,10 @@ check_digit <- function(digits){
   11 - (total %% 11)
 }
 
+#' Title
+#'
+#' @return d
+#' @export
 random_nhs_number <- function(){
   ## Generate 9 random digits to use
   digits <- sample(10,9) - 1
@@ -34,6 +44,12 @@ random_nhs_number <- function(){
   paste0(c(digits, as.character(check)), collapse = "")
 }
 
+#' Title
+#'
+#' @param nhs_number d
+#'
+#' @return d
+#' @export
 nhs_number_valid <- function(nhs_number){
   digits <- as.numeric(strsplit(as.character(nhs_number), "")[[1]])
 
@@ -59,6 +75,14 @@ nhs_number_valid <- function(nhs_number){
 
 }
 
+#' Title
+#'
+#' @param filename d
+#' @param seed d
+#' @param n d
+#'
+#' @return d
+#' @export
 gen_example_cambridge <- function(filename, seed = 1, n = 50){
   #x@svr$MODELLING_SQL_AREA$New_Cambridge_Score
   stopifnot(n >= 1)
@@ -78,7 +102,8 @@ gen_example_cambridge <- function(filename, seed = 1, n = 50){
   date_y     <- sample(2018:2020, size=n, replace = TRUE)
   date_m     <- sample(1:12, size=n, replace = TRUE)
   date_str   <- paste0(date_y,"-",date_m,"-1 00:00:00")
-  attribute_period <- as.POSIXct(lubridate::ymd_hms(date_str)) %>%
+  attribute_period <- as.POSIXct(lubridate::ymd_hms(date_str))
+  attribute_period <- rep(max(attribute_period), length(attribute_period)) %>%
     as.character()
 
   ## Make the data frame with the episode data
@@ -103,6 +128,14 @@ gen_example_cambridge <- function(filename, seed = 1, n = 50){
   message("Written generated Cambridge Score data to '", path, "'")
 }
 
+#' Title
+#'
+#' @param filename d
+#' @param seed d
+#' @param n d
+#'
+#' @return d
+#' @export
 gen_example_swd_activity <- function(filename, seed = 1, n = 50){
   #x@svr$MODELLING_SQL_AREA$swd_activity
   stopifnot(n >= 1)
@@ -139,6 +172,10 @@ gen_example_swd_activity <- function(filename, seed = 1, n = 50){
   message("Written generated SWD activity data to '", path, "'")
 }
 
+#' Title
+#'
+#' @return d
+#' @export
 get_some_lsoa_codes <- function(){
   return(c("E01014725",
            "E01014575",
@@ -152,6 +189,14 @@ get_some_lsoa_codes <- function(){
            "E01014640"))
 }
 
+#' Title
+#'
+#' @param filename d
+#' @param seed d
+#' @param n d
+#'
+#' @return d
+#' @export
 gen_example_swd_attributes_hist <- function(filename, seed = 1, n = 50){
   #x@svr$MODELLING_SQL_AREA$primary_care_attributes
   stopifnot(n >= 1)
@@ -200,9 +245,65 @@ gen_example_swd_attributes_hist <- function(filename, seed = 1, n = 50){
   message("Written generated SWD attributes history data to '", path, "'")
 }
 
+#' Title
+#'
+#' @param filename d
+#' @param seed d
+#' @param n d
+#'
+#' @return d
+#' @export
+gen_example_swd_attributes <- function(filename, seed = 1, n = 50){
+  #x@svr$MODELLING_SQL_AREA$swd_attribute
+  stopifnot(n >= 1)
+
+  ## Create the gendata/ folder if it does not exist
+  if (!dir.exists("gendata"))
+  {
+    dir.create("gendata")
+  }
+
+  ## Set the seed so that subsequent operations are repeatable
+  set.seed(seed)
+
+  ## Generate a random NHS number (not the real format)
+  nhs_number <- replicate(n, random_nhs_number())
+  age        <- sample(18:100, size=n, replace = TRUE)
+  sex        <- sample(c("Male","Female"), size=n, replace = TRUE)
+  lsoa       <- sample(get_some_lsoa_codes(), size=n, replace = TRUE)
+
+  ## Make the data frame with the episode data
+  tbl <- tibble::tibble(nhs_number = nhs_number,
+                        age = age,
+                        sex = sex,
+                        lsoa = lsoa)
+
+  ## Create the database
+  path <- paste0("gendata/", filename)
+  con <- DBI::dbConnect(RSQLite::SQLite(), path)
+
+  ## In case the file already exists and the table exists, remove the table
+  if (DBI::dbExistsTable(con, "swd_attribute")) {
+    DBI::dbRemoveTable(con, "swd_attribute")
+  }
+
+  ## Make a new table from the data frame
+  DBI::dbWriteTable(con, name="swd_attribute",
+                    value = tbl, overwrite = TRUE)
+
+  DBI::dbDisconnect(con)
+  message("Written generated SWD attributes data to '", path, "'")
+}
+
+#' Title
+#'
+#' @param filename d
+#' @param seed d
+#'
+#' @return d
+#' @export
 gen_example_imd_lsoa <- function(filename, seed = 1){
   #x@svr$Analyst_SQL_Area$tbl_BNSSG_Datasets_LSOA_IMD_2019
-  stopifnot(n >= 1)
 
   ## Create the gendata/ folder if it does not exist
   if (!dir.exists("gendata"))
@@ -238,6 +339,14 @@ gen_example_imd_lsoa <- function(filename, seed = 1){
   message("Written generated IMD data to '", path, "'")
 }
 
+#' Title
+#'
+#' @param filename d
+#' @param seed d
+#' @param n d
+#'
+#' @return d
+#' @export
 gen_example_cohort <- function(filename, seed = 1, n = 50){
   stopifnot(n >= 1)
 
@@ -286,14 +395,26 @@ gen_example_cohort <- function(filename, seed = 1, n = 50){
   message("Written generated cohort data to '", path, "'")
 }
 
+#' prepost_example
+#'
+#' @return side effects, creates data
+#' @export
+#'
 prepost_example <- function(){
-  gen_example_cohort("cohort.db")
+  n=1000
+  gen_example_cohort("cohort.db", n=n)
   gen_example_imd_lsoa("Analyst_SQL_Area.db")
-  gen_example_swd_attributes_hist("MODELLING_SQL_AREA.db")
-  gen_example_swd_activity("MODELLING_SQL_AREA.db")
-  gen_example_cambridge("MODELLING_SQL_AREA.db")
+  gen_example_swd_attributes("MODELLING_SQL_AREA.db", n=n)
+  gen_example_swd_attributes_hist("MODELLING_SQL_AREA.db", n=n)
+  gen_example_swd_activity("MODELLING_SQL_AREA.db", n=n)
+  gen_example_cambridge("MODELLING_SQL_AREA.db", n=n)
 }
 
+#' example_server
+#'
+#' @return an example server
+#' @export
+#'
 example_server <- function(){
   srv <- list(
     "cohort" = icdb::server(config = system.file("extdata", "sqlite_cohort.yml", package="PrePost")),
