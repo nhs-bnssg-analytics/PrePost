@@ -94,6 +94,7 @@ setGeneric("analyse", function(x) standardGeneric("analyse"))
 #' @return a full report
 #' @export
 setMethod("analyse", "PrePost", function(x) {
+
   run_descriptives(x)
   run_activity_summary(x, "before")
   run_activity_summary(x, "after")
@@ -103,6 +104,7 @@ setMethod("analyse", "PrePost", function(x) {
   generate_trace_plots(x, "before")
   generate_trace_plots(x, "before")
   generate_trace_plots(x, "around")
+
 })
 
 

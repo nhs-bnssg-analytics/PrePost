@@ -24,12 +24,12 @@ library(lubridate)
 svr <- icdb::server("XSW")
 
 # Define a cohort to study - importing from an .csv file
-cohort <- read.csv(system.file("extdata", "cohort - example 4.csv", package="PrePost")) %>%
+cohort <- read.csv(system.file("extdata", "cohort-example4.csv", package="PrePost")) %>%
   mutate(index_event_time=as.POSIXct(index_event_time))
 
 # Define the type(s) of activity to look at and the filtering that defines them
 # Importing from an .yaml file
-activity_filter <- read_yaml(system.file("extdata", "activity_coverage - example 4.yaml", package="PrePost"))
+activity_filter <- read_yaml(system.file("extdata", "activity_filter-example4.yaml", package="PrePost"))
 
 # Create the PrePost object 
 obj <- PrePost(nhs_number       = cohort$nhs_number,
