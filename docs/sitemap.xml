@@ -1,27 +1,126 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://nicksunderland.github.io/PrePost/404.html</loc>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/404.html</loc>
   </url>
   <url>
-    <loc>https://nicksunderland.github.io/PrePost/LICENSE-text.html</loc>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/LICENSE-text.html</loc>
   </url>
   <url>
-    <loc>https://nicksunderland.github.io/PrePost/LICENSE.html</loc>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/LICENSE.html</loc>
   </url>
   <url>
-    <loc>https://nicksunderland.github.io/PrePost/authors.html</loc>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/articles/PrePost.html</loc>
   </url>
   <url>
-    <loc>https://nicksunderland.github.io/PrePost/index.html</loc>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/articles/example1.html</loc>
   </url>
   <url>
-    <loc>https://nicksunderland.github.io/PrePost/reference/PrePost-class.html</loc>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/articles/example2.html</loc>
   </url>
   <url>
-    <loc>https://nicksunderland.github.io/PrePost/reference/index.html</loc>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/articles/example3.html</loc>
   </url>
   <url>
-    <loc>https://nicksunderland.github.io/PrePost/reference/run_descriptives-PrePost-method.html</loc>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/articles/example4.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/authors.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/index.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/PrePost-class.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/analyse-PrePost-method.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/analyse.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/check_digit.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/example_server.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/gen_example_cambridge.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/gen_example_cohort.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/gen_example_imd_lsoa.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/gen_example_swd_activity.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/gen_example_swd_attributes.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/gen_example_swd_attributes_hist.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/generate_theographs-PrePost-method.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/generate_theographs.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/generate_trace_plots-PrePost-method.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/generate_trace_plots.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/get_some_lsoa_codes.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/get_window-PrePost-method.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/get_window.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/nhs_number_valid.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/prepost_example.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/random_nhs_number.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/run_activity_summary-PrePost-method.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/run_activity_summary.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/run_activity_volume-PrePost-method.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/run_activity_volume.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/run_descriptives-PrePost-method.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/run_descriptives.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/set_window-PrePost-method.html</loc>
+  </url>
+  <url>
+    <loc>https://nhs-bnssg-analytics.github.io/PrePost/reference/set_window.html</loc>
   </url>
 </urlset>

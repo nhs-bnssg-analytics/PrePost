@@ -1,9 +1,14 @@
 pandoc: 2.19.2
 pkgdown: 2.0.6
 pkgdown_sha: ~
-articles: {}
-last_built: 2022-11-25T20:13Z
+articles:
+  PrePost: PrePost.html
+  example1: example1.html
+  example2: example2.html
+  example3: example3.html
+  example4: example4.html
+last_built: 2022-12-04T20:29Z
 urls:
-  reference: https://nicksunderland.github.io/PrePost/reference
-  article: https://nicksunderland.github.io/PrePost/articles
+  reference: https://nhs-bnssg-analytics.github.io/PrePost/reference
+  article: https://nhs-bnssg-analytics.github.io/PrePost/articles
 

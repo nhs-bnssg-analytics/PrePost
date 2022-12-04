@@ -1,0 +1,52 @@
+---
+title: "example1"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{example1}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, eval=FALSE}
+library(PrePost)
+library(dplyr)
+library(lubridate)
+
+# Create an icdb::server object to access the ICB databases
+svr <- icdb::server("XSW")
+
+# Define a cohort to study
+cohort <- svr$MODELLING_SQL_AREA$swd_activity %>% 
+  select(nhs_number, arr_date, prov_code, pod_l2a) %>% 
+  filter(arr_date >= lubridate::as_datetime('2022-08-01'), 
+         arr_date <= lubridate::as_datetime('2022-08-07'), 
+         prov_code %in% c('ra700','rvj00'), 
+         pod_l2a = 'ae') %>% 
+  select(nhs_number,
+         index_event_time=arr_date)
+
+# Define the type(s) of activity to look at and the filtering that defines them
+activity_filter <- list(
+  "A+E"                 = "pod_l1=='secondary' & pod_l2a=='ae'",
+  "OP T+O"              = "pod_l1=='secondary' & pod_l2a=='op' & spec_l1a=='110'",
+  "Community in-person" = "pod_l1=='community' & pod_l3=='physical'")
+
+# Create the PrePost object 
+obj <- PrePost(nhs_number       = cohort$nhs_number,
+               index_event_time = cohort$index_event_time,
+               window_pre       = 72,
+               window_post      = 72, 
+               window_units     = "hours",
+               activity_filter  = activity_filter,
+               svr              = svr)
+
+# Run the analysis
+analyse(obj)
+```

@@ -36,7 +36,19 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item">
+  <a class="nav-link" href="articles/PrePost.html">Get started</a>
+</li>
+<li class="nav-item">
   <a class="nav-link" href="reference/index.html">Reference</a>
+</li>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="articles/example1.html">example1</a>
+    <a class="dropdown-item" href="articles/example2.html">example2</a>
+    <a class="dropdown-item" href="articles/example3.html">example3</a>
+    <a class="dropdown-item" href="articles/example4.html">example4</a>
+  </div>
 </li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
@@ -54,30 +66,29 @@
 <div class="page-header"><h1 id="prepost">PrePost<a class="anchor" aria-label="anchor" href="#prepost"></a>
 </h1></div>
 <!-- badges: start -->
-<!-- badges: end -->
-<p>The goal of PrePost is to easily assess healthcare events occurring before and after a defined timepoint.</p>
+
+<div class="section level2">
+<h2 id="background">Background<a class="anchor" aria-label="anchor" href="#background"></a>
+</h2>
+<p>The first question will be: analyse pre and post activity relative to what? This ‘index event’ could arguably be anything – a GP attendance, an A+E visit, a 999 call, a particular point in time at which some intervention was made. From experience, many managers and clinicians all around the system have the same question: what happens before patients get to me, and what happens after? These are valuable questions in order to understand the extent to which patients are using healthcare services as intended, and to identify any interventions that could be made. For instance, if multiple interactions are detected before some ‘index event’ of interest, then analysis could reveal duplication and ‘bouncing around’. Analysis of post-event activity could reveal opportunities to improve care at the event point, e.g. providing additional information to the patient to allay any concerns that may otherwise lead them to seeking more healthcare afterwards. To date, we have received requests from clinicians to evaluate activity pre and post events for children’s A+E attendance, adult A+E head injury attendance, and hospital admission for heart attacks. The purpose-built and reusable solution presented here can answer those questions, in a matter of minutes, with very little analyst input.</p>
+</div>
+<div class="section level2">
+<h2 id="a-scalable-and-reusable-solution">A scalable and reusable solution<a class="anchor" aria-label="anchor" href="#a-scalable-and-reusable-solution"></a>
+</h2>
+<p>Rather than conduct bespoke analysis each time we are asked question like these, there are benefits to having a scalable and reusable solution, that can provide the required analysis at the touch of the button. For the tool developed here, all the analyst will need to define is: 1. Sufficient information to isolate the cohort of interest, via specification of the index event (ultimately, a list of NHS numbers and index event times). 2. Coverage of the pre/post activity, in terms of the time range (how many hours to search before/after the index event) and the care settings of interest (e.g. GP attends, outpatient consultations, MSK community physio, 999 see/treat calls). The analyst enters these inputs into an R script, which then automatically produces an MS Word document containing the main results. Full results are also available from a number of separate files also produced automatically by the script.</p>
+</div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p>You can install the development version of PrePost from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"nicksunderland/PrePost"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"nhs-bnssg-analytics/PrePost"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
+<h2 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
 </h2>
-<p>This is a basic example which shows you how to solve a common problem:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://nicksunderland.github.io/PrePost/">PrePost</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/PrePost-class.html">PrePost</a></span><span class="op">(</span>nhs_number       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"441"</span>, <span class="st">"720"</span>, <span class="st">"962"</span><span class="op">)</span>,</span>
-<span>             index_event_time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/structure.html" class="external-link">structure</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">164</span>, <span class="fl">164</span>, <span class="fl">165</span>, class <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"POSIXct"</span>,  <span class="st">"POSIXt"</span><span class="op">)</span>, tzone <span class="op">=</span> <span class="st">"GMT"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>             window_pre       <span class="op">=</span> <span class="fl">31</span>,</span>
-<span>             window_post      <span class="op">=</span> <span class="fl">30</span>, </span>
-<span>             window_units     <span class="op">=</span> <span class="st">"days"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">run_descriptives</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
+<p>Please see the ‘Getting started’ tab for an example using synthetic data. Examples that can be run on the actual System Wide Dataset can be found under the ‘Articles’ tab.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">
@@ -99,12 +110,17 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Richard Wood <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/YOUR-ORCID-ID" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
-<li>Nicholas Sunderland <br><small class="roles"> Author </small> <a href="https://orcid.org/YOUR-ORCID-ID" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Richard Wood <br><small class="roles"> Author </small>  </li>
+<li>Nicholas Sunderland <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0003-3625-630X" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/nhs-bnssg-analytics/PrePost/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/nhs-bnssg-analytics/PrePost/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+</ul>
+</div>
 
   </aside>
 </div>

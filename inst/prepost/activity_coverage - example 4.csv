@@ -1,6 +1,0 @@
-"activity_name","activity_filter"
-"A+E","pod_l1=='secondary' & pod_l2a=='ae'"
-"Community in-person","pod_l1=='community' & pod_l3=='physical'"
-"999","pod_l1=='999'"
-"111","pod_l1=='111'"
-"GP","pod_l1=='primary_care_contact'"
