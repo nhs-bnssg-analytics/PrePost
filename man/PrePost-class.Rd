@@ -17,5 +17,17 @@ PrePost
 \item{\code{nhs_number}}{character.}
 
 \item{\code{index_event_time}}{POSIXct.}
+
+\item{\code{window_pre}}{d}
+
+\item{\code{window_post}}{d}
+
+\item{\code{window_units}}{d}
+
+\item{\code{activity_filter}}{d}
+
+\item{\code{svr_name}}{d}
+
+\item{\code{svr}}{d}
 }}
 

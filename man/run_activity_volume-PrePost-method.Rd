@@ -7,9 +7,9 @@
 \S4method{run_activity_volume}{PrePost}(x, period)
 }
 \arguments{
-\item{period}{af bf or both}
+\item{x}{PrePost object}
 
-\item{PrePost}{PrePost object}
+\item{period}{one of c("after", "before", "around")}
 }
 \value{
 a table
