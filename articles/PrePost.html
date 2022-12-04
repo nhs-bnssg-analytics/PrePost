@@ -68,6 +68,54 @@
     
     
 <div class="section level2">
+<h2 id="background">Background<a class="anchor" aria-label="anchor" href="#background"></a>
+</h2>
+<p>The first question will be: analyse pre and post activity relative to
+what? This ‘index event’ could arguably be anything – a GP attendance,
+an A+E visit, a 999 call, a particular point in time at which some
+intervention was made. From experience, many managers and clinicians all
+around the system have the same question: what happens before patients
+get to me, and what happens after? These are valuable questions in order
+to understand the extent to which patients are using healthcare services
+as intended, and to identify any interventions that could be made. For
+instance, if multiple interactions are detected before some ‘index
+event’ of interest, then analysis could reveal duplication and ‘bouncing
+around’. Analysis of post-event activity could reveal opportunities to
+improve care at the event point, e.g. providing additional information
+to the patient to allay any concerns that may otherwise lead them to
+seeking more healthcare afterwards. To date, we have received requests
+from clinicians to evaluate activity pre and post events for children’s
+A+E attendance, adult A+E head injury attendance, and hospital admission
+for heart attacks. The purpose-built and reusable solution presented
+here can answer those questions, in a matter of minutes, with very
+little analyst input.</p>
+</div>
+<div class="section level2">
+<h2 id="a-scalable-and-reusable-solution">A scalable and reusable solution<a class="anchor" aria-label="anchor" href="#a-scalable-and-reusable-solution"></a>
+</h2>
+<p>Rather than conduct bespoke analysis each time we are asked question
+like these, there are benefits to having a scalable and reusable
+solution, that can provide the required analysis at the touch of the
+button. For the tool developed here, all the analyst will need to define
+is: 1. Sufficient information to isolate the cohort of interest, via
+specification of the index event (ultimately, a list of NHS numbers and
+index event times). 2. Coverage of the pre/post activity, in terms of
+the time range (how many hours to search before/after the index event)
+and the care settings of interest (e.g. GP attends, outpatient
+consultations, MSK community physio, 999 see/treat calls). The analyst
+enters these inputs into an R script, which then automatically produces
+an MS Word document containing the main results. Full results are also
+available from a number of separate files also produced automatically by
+the script.</p>
+</div>
+<div class="section level2">
+<h2 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
+</h2>
+<p>Please see below for an example using synthetic data. Examples that
+can be run on the actual System Wide Dataset can be found under the
+‘Articles’ tab.</p>
+</div>
+<div class="section level2">
 <h2 id="connecting-to-the-database">Connecting to the database<a class="anchor" aria-label="anchor" href="#connecting-to-the-database"></a>
 </h2>
 <p>First, generate the artificial data (sqlite files for each database),
@@ -90,29 +138,194 @@ connect to this databases using:</p>
 <span></span>
 <span><span class="co"># in this example we can connect to the synthetic data using</span></span>
 <span><span class="va">srv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/example_server.html">example_server</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>Define the cohort - here an example cohort is provided on the example
-server. All we need is the (pseudo) NHS number and the datetime of
-interest.</p>
+</div>
+<div class="section level2">
+<h2 id="define-the-cohort">Define the cohort<a class="anchor" aria-label="anchor" href="#define-the-cohort"></a>
+</h2>
+<p>Here an example cohort is provided on the example server. All we need
+is the (pseudo) NHS number and the datetime of interest.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ids</span>  <span class="op">&lt;-</span> <span class="va">srv</span><span class="op">$</span><span class="va">cohort</span><span class="op">$</span><span class="va">COHORT_SYNTH</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">nhs_number</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">date</span> <span class="op">&lt;-</span> <span class="va">srv</span><span class="op">$</span><span class="va">cohort</span><span class="op">$</span><span class="va">COHORT_SYNTH</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">index_event_time</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>Next we create a PrePost object, defining the window of interest. If
-working on the ICB servers you will need to pass the name of the data
-source as the parameter <code>srv_name</code>.</p>
+</div>
+<div class="section level2">
+<h2 id="define-the-activity-filters">Define the activity filters<a class="anchor" aria-label="anchor" href="#define-the-activity-filters"></a>
+</h2>
+<p>Here we must decide which healthcare activity we are interested in.
+We can define any number of filters to act on SWD activity columns, as a
+named list. The name of each filter will be used in the subsequent
+plots.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">activity_filter</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  <span class="st">"A+E"</span>                 <span class="op">=</span> <span class="st">"pod_l1=='secondary' &amp; pod_l2a=='ae'"</span>,</span>
+<span>  <span class="st">"Community in-person"</span> <span class="op">=</span> <span class="st">"pod_l1=='community' &amp; pod_l3=='physical'"</span>,</span>
+<span>  <span class="st">"999"</span>                 <span class="op">=</span> <span class="st">"pod_l1=='999'"</span>,</span>
+<span>  <span class="st">"111"</span>                 <span class="op">=</span> <span class="st">"pod_l1=='111'"</span>,</span>
+<span>  <span class="st">"GP"</span>                  <span class="op">=</span> <span class="st">"pod_l1=='primary_care_contact'"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="create-the-prepost-object">Create the PrePost object<a class="anchor" aria-label="anchor" href="#create-the-prepost-object"></a>
+</h2>
+<p>Next we create a PrePost object, defining the window of interest. If
+working on the ICB servers you will need to pass the name of your ICB
+data source as the parameter <code>srv_name</code>. Please see the ICDB
+package documentation for instructions on how to setup the ICB data
+source. In this example we directly pass an example_server - this is
+purely for demonstration.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/PrePost-class.html">PrePost</a></span><span class="op">(</span>nhs_number       <span class="op">=</span> <span class="va">ids</span>,</span>
 <span>               index_event_time <span class="op">=</span> <span class="va">date</span>,</span>
 <span>               window_pre       <span class="op">=</span> <span class="fl">31</span>,</span>
 <span>               window_post      <span class="op">=</span> <span class="fl">30</span>, </span>
 <span>               window_units     <span class="op">=</span> <span class="st">"days"</span>,</span>
-<span>               svr              <span class="op">=</span> <span class="fu"><a href="../reference/example_server.html">example_server</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>               activity_filter  <span class="op">=</span> <span class="va">activity_filter</span>,</span>
+<span>               svr              <span class="op">=</span> <span class="fu"><a href="../reference/example_server.html">example_server</a></span><span class="op">(</span><span class="op">)</span>, </span>
+<span>               svr_name         <span class="op">=</span> <span class="cn">NA_character_</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="descriptives">Descriptives<a class="anchor" aria-label="anchor" href="#descriptives"></a>
+</h2>
 <p>Run the descriptive analysis</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">run_descriptives</span>(obj)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cn">FALSE</span> [<span class="dv">1</span>] Running descriptive summary of cohort...</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="cn">FALSE</span> [<span class="dv">1</span>] Finished descriptive summary of cohort...</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/run_descriptives.html">run_descriptives</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span></code></pre></div>
 <p><img src="PrePost_files/figure-html/descriptives-1.png" width="672"></p>
 </div>
-  </main>
+<div class="section level2">
+<h2 id="activity-analysis">Activity analysis<a class="anchor" aria-label="anchor" href="#activity-analysis"></a>
+</h2>
+<p>Run the activity analysis</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/run_activity_summary.html">run_activity_summary</a></span><span class="op">(</span><span class="va">obj</span>, <span class="st">"before"</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<caption>Summary of activity volumes before the index event</caption>
+<colgroup>
+<col width="16%">
+<col width="22%">
+<col width="22%">
+<col width="37%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Activity</th>
+<th align="right">Mean activity per instance</th>
+<th align="right">Instances with &gt;0 activity</th>
+<th align="right">Mean activity per instance with &gt;0 activity</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">111</td>
+<td align="right">0.07</td>
+<td align="right">6.8%</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">999</td>
+<td align="right">0.07</td>
+<td align="right">7%</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">A+E</td>
+<td align="right">0.03</td>
+<td align="right">2.8%</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">Community in-person</td>
+<td align="right">0.07</td>
+<td align="right">7.4%</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">GP</td>
+<td align="right">0.08</td>
+<td align="right">8.1%</td>
+<td align="right">1</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/run_activity_summary.html">run_activity_summary</a></span><span class="op">(</span><span class="va">obj</span>, <span class="st">"after"</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<caption>Summary of activity volumes after the index event</caption>
+<colgroup>
+<col width="16%">
+<col width="22%">
+<col width="22%">
+<col width="37%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Activity</th>
+<th align="right">Mean activity per instance</th>
+<th align="right">Instances with &gt;0 activity</th>
+<th align="right">Mean activity per instance with &gt;0 activity</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">111</td>
+<td align="right">0.07</td>
+<td align="right">7.2%</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">999</td>
+<td align="right">0.09</td>
+<td align="right">9.2%</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">A+E</td>
+<td align="right">0.02</td>
+<td align="right">2.3%</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">Community in-person</td>
+<td align="right">0.06</td>
+<td align="right">6.2%</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">GP</td>
+<td align="right">0.08</td>
+<td align="right">7.7%</td>
+<td align="right">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level2">
+<h2 id="theographs">Theographs<a class="anchor" aria-label="anchor" href="#theographs"></a>
+</h2>
+<p>Generate the theographs</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/generate_theographs.html">generate_theographs</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span></code></pre></div>
+<p><img src="PrePost_files/figure-html/generate_theographs-1.png" width="672"></p>
+</div>
+<div class="section level2">
+<h2 id="activity-volume">Activity volume<a class="anchor" aria-label="anchor" href="#activity-volume"></a>
+</h2>
+<p>Analyse the activity volume</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/run_activity_volume.html">run_activity_volume</a></span><span class="op">(</span><span class="va">obj</span>, <span class="st">"before"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/run_activity_volume.html">run_activity_volume</a></span><span class="op">(</span><span class="va">obj</span>, <span class="st">"after"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="trace-plots">Trace plots<a class="anchor" aria-label="anchor" href="#trace-plots"></a>
+</h2>
+<p>Generate the trace plots</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/generate_trace_plots.html">generate_trace_plots</a></span><span class="op">(</span><span class="va">obj</span>, <span class="st">"before"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="PrePost_files/figure-html/trace_plots-1.png" width="672"></p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/generate_trace_plots.html">generate_trace_plots</a></span><span class="op">(</span><span class="va">obj</span>, <span class="st">"before"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="PrePost_files/figure-html/trace_plots-2.png" width="672"></p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/generate_trace_plots.html">generate_trace_plots</a></span><span class="op">(</span><span class="va">obj</span>, <span class="st">"around"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="PrePost_files/figure-html/trace_plots-3.png" width="672"></p>
+</div>
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
