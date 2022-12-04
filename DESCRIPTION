@@ -1,12 +1,12 @@
 Package: PrePost
-Title: What the Package Does (One Line, Title Case)
+Title: Perievent Healthcare Usage Analysis
 Version: 0.0.0.9000
 Authors@R: c(
     person("Richard", "Wood", , "richard.wood16@nhs.net", role = c("aut","cre")),
     person("Nicholas", "Sunderland", , "nicholas.p.sunderland@gmail.com", role = c("aut"),
            comment = c(ORCID = "0000-0003-3625-630X"))
     )
-Description: What the package does (one paragraph).
+Description: A scalable and reusable solution for perievent healthcare usage analysis.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
