@@ -3,7 +3,11 @@ pkgdown: 2.0.6
 pkgdown_sha: ~
 articles:
   PrePost: PrePost.html
-last_built: 2022-12-04T19:34Z
+  example1: example1.html
+  example2: example2.html
+  example3: example3.html
+  example4: example4.html
+last_built: 2022-12-04T20:55Z
 urls:
   reference: https://nhs-bnssg-analytics.github.io/PrePost/reference
   article: https://nhs-bnssg-analytics.github.io/PrePost/articles
