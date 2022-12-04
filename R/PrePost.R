@@ -94,11 +94,15 @@ setGeneric("analyse", function(x) standardGeneric("analyse"))
 #' @return a full report
 #' @export
 setMethod("analyse", "PrePost", function(x) {
-
-  # Run everything
-  # Check wd and ask if appropriate to add files to
-  # Otherwise ask to call set_prepost_wd()
-
+  run_descriptives(x)
+  run_activity_summary(x, "before")
+  run_activity_summary(x, "after")
+  generate_theographs(x)
+  run_activity_volume(x, "before")
+  run_activity_volume(x, "after")
+  generate_trace_plots(x, "before")
+  generate_trace_plots(x, "before")
+  generate_trace_plots(x, "around")
 })
 
 
