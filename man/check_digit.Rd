@@ -7,7 +7,7 @@
 check_digit(digits)
 }
 \arguments{
-\item{digits}{}
+\item{digits}{d}
 }
 \value{
 d

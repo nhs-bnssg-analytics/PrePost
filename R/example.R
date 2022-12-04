@@ -1,6 +1,6 @@
 #' Title
 #'
-#' @param digits
+#' @param digits d
 #'
 #' @return d
 #' @export
@@ -152,8 +152,46 @@ gen_example_swd_activity <- function(filename, seed = 1, n = 50){
   ## Generate a random NHS number (not the real format)
   nhs_number <- replicate(n, random_nhs_number())
 
+  ## Generate random start and end times for each episode. Episodes
+  ## do not overlap in this example, and each one starts when the previous
+  ## one ends
+  start_date       <- lubridate::ymd("2018-1-1")
+  end_date         <- lubridate::ymd("2020-1-1")
+  sub_time         <- lubridate::duration(-336:336, units = "hours")
+  add_time         <- lubridate::duration(1:336, units = "hours")
+  arr_date         <- lubridate::as_datetime(
+    stats::runif(n,
+                 as.numeric(as.POSIXct(start_date)),
+                 as.numeric(as.POSIXct(end_date))))
+  arr_date         <- arr_date - sample(sub_time, size = n, replace = TRUE)
+  dep_date         <- arr_date + sample(add_time, size = n, prob = seq(0.2,0.01,length.out=length(add_time)), replace = TRUE)
+
+
   ## Make the data frame with the episode data
-  tbl <- tibble::tibble(nhs_number = nhs_number)
+  # TODO: make data more realistics - this will generate impossible combinations of values...
+  tbl <- tibble::tibble(nhs_number  = nhs_number,
+                        arr_date    = as.character(arr_date),
+                        dep_date    = as.character(dep_date),
+                        prov_code   = sample(c('ra700','rvj00'), size=n, replace=TRUE),
+                        pod_l1      = sample(c("primary_care_contact", "primary_care_prescription", "secondary", "community", "mental_health", "111", "999"), size=n, replace=TRUE),
+                        pod_l2a	    = sample(c("ae", "op", "ip"), size=n, replace=TRUE),
+                        pod_l2b	    = sample(c("see & treat", "non_elective"), size=n, replace=TRUE),
+                        pod_l2c	    = sample(c("test_database"), size=n, replace=TRUE),
+                        pod_l3	    = sample(c("physical"), size=n, replace=TRUE),
+                        pod_l4	    = sample(c("test_database"), size=n, replace=TRUE),
+                        spec_l1a	  = sample(c("110"), size=n, replace=TRUE),
+                        spec_l1b	  = sample(c("test_database"), size=n, replace=TRUE),
+                        spec_l2a	  = sample(c("test_database"), size=n, replace=TRUE),
+                        spec_l2b	  = sample(c("test_database"), size=n, replace=TRUE),
+                        attend_code	= sample(c("test_database"), size=n, replace=TRUE),
+                        cost1	      = sample(c("test_database"), size=n, replace=TRUE),
+                        cost1_type	= sample(c("test_database"), size=n, replace=TRUE),
+                        cost2	      = sample(c("test_database"), size=n, replace=TRUE),
+                        cost2_type	= sample(c("test_database"), size=n, replace=TRUE),
+                        fy	        = sample(c("test_database"), size=n, replace=TRUE),
+                        source_id	  = sample(c("test_database"), size=n, replace=TRUE),
+                        version	    = sample(c("test_database"), size=n, replace=TRUE),
+                        source_id_name = sample(c("test_database"), size=n, replace=TRUE))
 
   ## Create the database
   path <- paste0("gendata/", filename)
